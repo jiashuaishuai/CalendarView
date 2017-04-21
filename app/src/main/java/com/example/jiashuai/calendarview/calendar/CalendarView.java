@@ -10,9 +10,9 @@ import android.widget.LinearLayout;
  */
 
 public class CalendarView extends LinearLayout {
-    private SelfAdaptionViewPager viewPager;
+    private MonthViewpager viewPager;
     private WeekBarView weekBarView;
-
+    private MonthView.OnClickMonthViewDayListener listener;
     public CalendarView(Context context) {
         this(context, null);
     }
@@ -23,9 +23,13 @@ public class CalendarView extends LinearLayout {
 
     public CalendarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        viewPager = new SelfAdaptionViewPager(context);
+        viewPager = new MonthViewpager(context);
         weekBarView = new WeekBarView(context);
         addView(weekBarView);
         addView(viewPager);
+    }
+
+    public void setListener(MonthView.OnClickMonthViewDayListener listener) {
+        viewPager.setListener(listener);
     }
 }

@@ -1,31 +1,41 @@
 package com.example.jiashuai.calendarview.calendar;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by JiaShuai on 2017/4/19.
  */
 
 public class MonthAdapter extends PagerAdapter {
-    private int mCount = 15;
+    private int mCount = 100;
     private SparseArray<MonthView> mViews;
     private Context mContext;
-    private TypedArray mArray;
-    private int year = 2017, month, day = 19;
-//    private CalendarView calendarView;
+    private int currYear = 2017, currMonth = 4, currDay = 16;
+    private MonthView.OnClickMonthViewDayListener listener;
+    private List<Integer> hintList;
 
     public MonthAdapter(Context context) {
         mContext = context;
         mViews = new SparseArray<>();
+        hintList = new ArrayList<>();
+        hintList.add(2);
+        hintList.add(14);
+        hintList.add(19);
+        hintList.add(24);
     }
 
     @Override
     public int getCount() {
+        if (mCount < 7) {
+            mCount = 7;//最少7页
+        }
         return mCount;
     }
 
@@ -34,9 +44,12 @@ public class MonthAdapter extends PagerAdapter {
         if (mViews.get(position) == null) {
             int date[] = getYearAndMonth(position);
             MonthView calendarView = new MonthView(mContext, date[0], date[1]);
+            calendarView.initCurrMonth(currYear, currMonth, currDay);
+            calendarView.setmHintList(hintList);
             calendarView.setId(position);
             calendarView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             calendarView.invalidate();
+            calendarView.setOnClickMonthViewDayListener(listener);
             mViews.put(position, calendarView);
         }
         container.addView(mViews.get(position));
@@ -55,27 +68,9 @@ public class MonthAdapter extends PagerAdapter {
 
     public int[] getYearAndMonth(int position) {
         int date[] = new int[2];
-        if (mCount < 7) {
-            mCount = 7;
-        }
-        if (year > 2017) {
-            month++;
-        } else if (year < 2017) {
-            month--;
-        } else {
-            month = 3 + position - 2;
-        }
-        //月按照java规则从0月开始到11月
-        if (month > 11) {//月大于11加一年，
-            year++;
-            month = month - 12;
-        }
-        if (month < 0) {//月小于0减一年
-            year--;
-            month = 12 + month;//
-        }
-        date[0] = year;
-        date[1] = month;
+        int selectMonth = (currMonth - 1) + position - mCount/2;
+        date[0] = CalendarUtils.plusMonths(currYear, selectMonth)[0];
+        date[1] = CalendarUtils.plusMonths(currYear, selectMonth)[1];
         return date;
     }
 
@@ -83,8 +78,7 @@ public class MonthAdapter extends PagerAdapter {
         return mViews.get(position);
     }
 
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        super.setPrimaryItem(container, position, object);
+    public void setListener(MonthView.OnClickMonthViewDayListener listener) {
+        this.listener = listener;
     }
 }

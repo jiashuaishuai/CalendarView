@@ -40,6 +40,7 @@ public class CalendarUtils {
                 return -1;
         }
     }
+
     /**
      * 返回当前月份1号位于周几
      *
@@ -51,5 +52,24 @@ public class CalendarUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, 1);
         return calendar.get(Calendar.DAY_OF_WEEK);
+    }
+
+    //获取月+1返回年月月按照java规则从0月开始到11月
+    public static int[] plusMonths(int year, int month) {
+        int date[] = new int[2];
+        int nextYear;
+        if (month > 11) {//月大于11加一年，
+            nextYear = month / 12;
+            year += nextYear;
+            month = month - 12 * nextYear;
+        }
+        if (month < 0) {//月小于0减一年
+            nextYear=(11-month)/12;
+            year -= nextYear;
+            month = 12*nextYear+ month;//
+        }
+        date[0] = year;
+        date[1] = month;
+        return date;
     }
 }

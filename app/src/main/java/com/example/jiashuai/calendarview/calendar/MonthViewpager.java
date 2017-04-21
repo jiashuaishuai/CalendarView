@@ -10,21 +10,24 @@ import android.view.ViewGroup;
  * Created by JiaShuai on 2017/4/19.
  */
 
-public class SelfAdaptionViewPager extends ViewPager {
+public class MonthViewpager extends ViewPager {
     private MonthAdapter adapter;
     private MonthView calendarView, nextView;
     private int selectPagerHeight, nextPagerHeigth;
     private int defaultHeight;
+    private MonthView.OnClickMonthViewDayListener listener;
+    private MonthAdapter monthAdapter;
 
-    public SelfAdaptionViewPager(Context context) {
+    public MonthViewpager(Context context) {
         this(context,null);
     }
 
-    public SelfAdaptionViewPager(Context context, AttributeSet attrs) {
+    public MonthViewpager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setAdapter(new MonthAdapter(context));
-        setOffscreenPageLimit(2);
-        setCurrentItem(2);
+        monthAdapter= new MonthAdapter(context);
+        setAdapter(monthAdapter);
+        setCurrentItem(50);
+//        setOffscreenPageLimit(2);
         defaultHeight = getResources().getDisplayMetrics().heightPixels / 5 * 2;//跟View一样
         addOnPageChangeListener(new OnPageChangeListener() {
             @Override
@@ -69,5 +72,9 @@ public class SelfAdaptionViewPager extends ViewPager {
             heightMeasureSpec = MeasureSpec.makeMeasureSpec(defaultHeight, MeasureSpec.getMode(heightMeasureSpec));
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    public void setListener(MonthView.OnClickMonthViewDayListener listener) {
+        adapter.setListener(listener);
     }
 }
