@@ -1,4 +1,4 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.calendarview;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
@@ -6,7 +6,10 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.bean.CollectionDateBean;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,30 +17,25 @@ import java.util.List;
  */
 
 public class MonthAdapter extends PagerAdapter {
-    private int mCount = 15;
-    private int currPager;
     private SparseArray<MonthView> mViews;
     private Context mContext;
-    private int currYear = 2017, currMonth = 4, currDay = 16;
+    private int currYear, currMonth, currDay;
     private MonthView.OnClickMonthViewDayListener clickMonthViewDayListener;
-    private List<Integer> hintList;
+    private List<CollectionDateBean.Data.YearData.MonthData> monthList;
 
     public MonthAdapter(Context context) {
         mContext = context;
         mViews = new SparseArray<>();
-        hintList = new ArrayList<>();
-        hintList.add(2);
-        hintList.add(14);
-        hintList.add(19);
-        hintList.add(24);
+    }
+
+    public void setYearDataList(List<CollectionDateBean.Data.YearData.MonthData> monthList) {
+        this.monthList = monthList;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        if (mCount < 7) {
-            mCount = 7;//最少7页
-        }
-        return mCount;
+        return Utils.listIsNull(monthList) ? 0 : monthList.size();
     }
 
     @Override
@@ -46,7 +44,7 @@ public class MonthAdapter extends PagerAdapter {
             int date[] = getYearAndMonth(position);
             MonthView calendarView = new MonthView(mContext, date[0], date[1]);
             calendarView.initCurrMonth(currYear, currMonth, currDay);
-            calendarView.setmHintList(hintList);
+            calendarView.setmHintList(monthList.get(position).getDayList());
             calendarView.setId(position);
             calendarView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             calendarView.invalidate();
@@ -69,9 +67,9 @@ public class MonthAdapter extends PagerAdapter {
 
     public int[] getYearAndMonth(int position) {
         int date[] = new int[2];
-        int selectMonth = (currMonth - 1) + position - currPager;
-        date[0] = CalendarUtils.plusMonths(currYear, selectMonth)[0];
-        date[1] = CalendarUtils.plusMonths(currYear, selectMonth)[1];
+        String s = monthList.get(position).getMonth();
+        date[0] = Integer.parseInt(s.split("-")[0]);
+        date[1] = Integer.parseInt(s.split("-")[1]) - 1;
         return date;
     }
 
@@ -83,7 +81,19 @@ public class MonthAdapter extends PagerAdapter {
         this.clickMonthViewDayListener = clickMonthViewDayListener;
     }
 
-    public void setCurrPager(int pager){
-        currPager = pager;
+    //设置当前日期
+    public void setCurrDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        currYear = calendar.get(Calendar.YEAR);
+        currMonth = calendar.get(Calendar.MONTH) + 1;
+        currDay = calendar.get(Calendar.DAY_OF_MONTH);
     }
+
+    public void selectToday(int index) {
+        MonthView monthView = mViews.get(index);
+        if (monthView != null)
+            monthView.setSelectDay(currDay);
+    }
+
 }

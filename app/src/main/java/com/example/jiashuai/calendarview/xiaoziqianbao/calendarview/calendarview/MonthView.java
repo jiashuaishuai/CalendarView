@@ -1,4 +1,4 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.calendarview;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,10 +11,15 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.bean.CollectionDateBean;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by JiaShuai on 2017/4/18.
+ * 注意，currMonth取得是自然月从1开始
+ * selMonth取得是JAVA标准，从0开始
  */
 
 public class MonthView extends View {
@@ -43,7 +48,7 @@ public class MonthView extends View {
     private int weekNumber, monthDays;//本月一号是星期几，本月有多少天
     private int selectMonthRow;//计算当前月份是5行还是6行
     private OnClickMonthViewDayListener onClickMonthViewDayListener;
-    private List<Integer> mHintList;
+    private List<Integer> mHintList = new ArrayList<>();
 
 
     private void initGestureDetector() {
@@ -141,8 +146,6 @@ public class MonthView extends View {
         mCurrYear = year;
         mCurrMonth = month;
         mSelDay = mCurrDay = day;
-        invalidate();
-
     }
 
     @Override
@@ -157,7 +160,7 @@ public class MonthView extends View {
 //        }
 //        if (widthMode == MeasureSpec.AT_MOST) {
 //        }
-        int heightSize = mDisplayMetrics.heightPixels / 5 * 2;//这里必须写固定大小，如果测量View的高度，View高度改变，文字高度也会跟着改变，
+        int heightSize = mDisplayMetrics.heightPixels / 3;//这里必须写固定大小，如果测量View的高度，View高度改变，文字高度也会跟着改变，
         initSize(widthSize, heightSize);
         setMeasuredDimension(widthSize, heightSize);//设置view大小
 
@@ -175,8 +178,8 @@ public class MonthView extends View {
     private void initSize(int widthSize, int heightSize) {
         mColumnSize = widthSize / NUM_COLUMNS;//View宽度/7=文字宽度
         mRowSize = heightSize / NUM_ROWS;//View高度/6 = 文字高度
-        mSelectCircleSize = mColumnSize / 4;//圆圈的大小;
-        mHintCircleRadius = (int) (mSelectCircleSize / 5);
+        mSelectCircleSize = (int) (mColumnSize / 4.5);//圆圈的大小;
+        mHintCircleRadius = (mSelectCircleSize / 4);
         while (mSelectCircleSize > mRowSize / 2) {//如果圆圈大小超出view高度/1.3
             mSelectCircleSize = (int) (mSelectCircleSize / 1.3);
         }
@@ -201,7 +204,7 @@ public class MonthView extends View {
             if (dayString.equals(String.valueOf(mSelDay))) {//如果是选中的天
                 float recX = mColumnSize * column + mColumnSize / 2;//圆心x
                 float recY = mRowSize * row + mRowSize / 2;//圆心y
-                if (mSelYear == mCurrYear && mSelMonth == mCurrMonth && day + 1 == mCurrDay) {//如果选中的是当天
+                if (mSelYear == mCurrYear && mSelMonth == mCurrMonth - 1 && day + 1 == mCurrDay) {//如果选中的是当天
                     mPaint.setColor(mSelectTodayCircleBGColor);
                 } else {
                     mPaint.setColor(mSelectCircleBGColor);
@@ -269,13 +272,31 @@ public class MonthView extends View {
         this.onClickMonthViewDayListener = listener;
     }
 
-    public void setmHintList(List<Integer> mHintList) {
-        this.mHintList = mHintList;
-        if (mHintList != null && mHintList.size() > 0)
+    public void setmHintList(List<CollectionDateBean.Data.YearData.MonthData.DayData> yearDataList) {
+        if (!Utils.listIsNull(yearDataList))
+            for (CollectionDateBean.Data.YearData.MonthData.DayData dayData : yearDataList) {
+                String[] ss = dayData.getDueDate().split("-");
+                mHintList.add(Integer.parseInt(ss[ss.length - 1]));
+            }
+        if (mCurrYear == getSelYear() && mCurrMonth == getSelMonth() && mCurrDay != 0)//如果是当年当月，则选中的天为今天
+        {
+            mSelDay = mCurrDay;
+        } else if (!Utils.listIsNull(mHintList)) {//先判断有没有回款，如果有则选中第一天
             mSelDay = mHintList.get(0);
+        } else {//如果没有默认选择1号
+            mSelDay = 1;
+        }
     }
 
     public interface OnClickMonthViewDayListener {
         void clickCallBacak(int selYear, int selMonth, int selDay);
     }
+
+    public void setSelectDay(int day) {
+        mSelDay = day;
+        invalidate();
+        if (onClickMonthViewDayListener != null)
+            onClickMonthViewDayListener.clickCallBacak(getSelYear(), getSelMonth(), getSelDay());
+    }
+
 }

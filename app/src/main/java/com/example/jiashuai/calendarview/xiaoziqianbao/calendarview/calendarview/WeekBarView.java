@@ -1,4 +1,4 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.calendarview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.example.jiashuai.calendarview.R;
+
 
 /**
  * Created by Jimmy on 2016/10/6 0006.
@@ -48,7 +49,7 @@ public class WeekBarView extends View {
         mWeekSize = array.getInteger(R.styleable.WeekBarView_week_text_size, 14);
         linColor = array.getInteger(R.styleable.WeekBarView_linColor, Color.parseColor("#efefef"));
         linHeight = array.getInteger(R.styleable.WeekBarView_linHeight, 1);
-        backgroundColor = array.getInteger(R.styleable.WeekBarView_backgroundColor,Color.parseColor("#fafafa"));
+        backgroundColor = array.getInteger(R.styleable.WeekBarView_backgroundColor, Color.parseColor("#fafafa"));
         array.recycle();
         mWeekString = context.getResources().getStringArray(R.array.calendar_week);
     }
@@ -57,7 +58,7 @@ public class WeekBarView extends View {
         mDisplayMetrics = getResources().getDisplayMetrics();
         mLinPaint = new Paint();
         mLinPaint.setColor(linColor);
-        mLinPaint.setStrokeWidth((float) linHeight* mDisplayMetrics.scaledDensity);
+        mLinPaint.setStrokeWidth((float) linHeight * mDisplayMetrics.scaledDensity);
 
 
         //实例化文字画笔
@@ -76,7 +77,6 @@ public class WeekBarView extends View {
         if (heightMode == MeasureSpec.AT_MOST) {
             heightSize = (int) (mDisplayMetrics.scaledDensity * 40);
         }
-
         setMeasuredDimension(widthSize, heightSize);
     }
 
@@ -86,7 +86,7 @@ public class WeekBarView extends View {
         int height = getHeight();
         canvas.drawColor(backgroundColor);
         //绘制线条
-        canvas.drawLine(0, 1, width, 1, mLinPaint);
+        canvas.drawLine(0, 0, width, 0, mLinPaint);
         canvas.drawLine(0, height, width, height, mLinPaint);
 
         //绘制文字

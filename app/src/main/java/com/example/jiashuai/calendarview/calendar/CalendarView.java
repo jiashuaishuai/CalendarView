@@ -12,7 +12,9 @@ import android.widget.LinearLayout;
 public class CalendarView extends LinearLayout {
     private MonthViewpager viewPager;
     private WeekBarView weekBarView;
-    private MonthView.OnClickMonthViewDayListener listener;
+    private MonthView.OnClickMonthViewDayListener clickMonthViewDayListener;//点击日历监听
+    private MonthViewpager.MonthPagerChangeListener monthPagerChangeListener;//日历pager改变监听
+    private int currPager;
     public CalendarView(Context context) {
         this(context, null);
     }
@@ -29,7 +31,15 @@ public class CalendarView extends LinearLayout {
         addView(viewPager);
     }
 
-    public void setListener(MonthView.OnClickMonthViewDayListener listener) {
-        viewPager.setListener(listener);
+    public void setMonthPagerChangeListener(MonthViewpager.MonthPagerChangeListener monthPagerChangeListener) {
+        this.monthPagerChangeListener = monthPagerChangeListener;
+        viewPager.setMonthPagerChangeListener(monthPagerChangeListener);
+    }
+
+    public void setClickMonthViewDayListener(MonthView.OnClickMonthViewDayListener listener) {
+        viewPager.setClickMonthViewDayListener(listener);
+    }
+    public void setCurrPager(int pager){
+        viewPager.setCurrPager(pager);
     }
 }

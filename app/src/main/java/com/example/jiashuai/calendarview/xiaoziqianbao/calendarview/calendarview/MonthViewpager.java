@@ -1,10 +1,17 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.calendarview;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
+
+import com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.bean.CollectionDateBean;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by JiaShuai on 2017/4/19.
@@ -16,7 +23,7 @@ public class MonthViewpager extends ViewPager {
     private int selectPagerHeight, nextPagerHeigth;
     private int defaultHeight;
     private MonthView.OnClickMonthViewDayListener listener;
-    public MonthPagerChangeListener monthPagerChangeListener;
+    //    public MonthPagerChangeListener monthPagerChangeListener;
     public int currPager;
 
     public MonthViewpager(Context context) {
@@ -28,7 +35,7 @@ public class MonthViewpager extends ViewPager {
         adapter = new MonthAdapter(context);
         setAdapter(adapter);
 //        setOffscreenPageLimit(2);
-        defaultHeight = getResources().getDisplayMetrics().heightPixels / 5 * 2;//跟View一样
+        defaultHeight = getResources().getDisplayMetrics().heightPixels / 3;//跟View一样
     }
 
 
@@ -59,17 +66,46 @@ public class MonthViewpager extends ViewPager {
     }
 
     public void setClickMonthViewDayListener(MonthView.OnClickMonthViewDayListener listener) {
+        this.listener = listener;
         adapter.setClickMonthViewDayListener(listener);
+        setMonthPagerChangeListener();
     }
 
-    public void setCurrPager(int pager) {
-        currPager = pager;
-        setCurrentItem(pager);
-        adapter.setCurrPager(pager);
+    public void setAdapterDate(List<CollectionDateBean.Data.YearData> yearDataList, String currdatemilliseconds) {
+        List<CollectionDateBean.Data.YearData.MonthData> monthList = new ArrayList<>();
+        //格式化当前时间
+        Date date = new Date(Long.parseLong(currdatemilliseconds));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM", Locale.CHINA);
+        String currDate = sdf.format(date);
+        int pager = 0;
+        for (CollectionDateBean.Data.YearData yearData : yearDataList) {
+            for (CollectionDateBean.Data.YearData.MonthData monthData : yearData.getMonthList()) {
+                monthList.add(monthData);
+                if (monthData.getMonth().equals(currDate)) {
+                    //记录当前时间为pager第几页
+                    currPager = pager;
+                }
+                pager++;
+            }
+        }
+
+        adapter.setCurrDate(date);
+        adapter.setYearDataList(monthList);
     }
 
-    public void setMonthPagerChangeListener(final MonthPagerChangeListener monthPagerChangeListener) {
-        this.monthPagerChangeListener = monthPagerChangeListener;
+    //选中当前月
+    public void selectPagerCurrMonth() {
+        setCurrentItem(currPager);
+    }
+
+    //回到今天
+    public void goToday() {
+        setCurrentItem(currPager);
+        adapter.selectToday(currPager);
+    }
+
+    public void setMonthPagerChangeListener() {
+//        this.monthPagerChangeListener = monthPagerChangeListener;
         addOnPageChangeListener(new OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -79,8 +115,8 @@ public class MonthViewpager extends ViewPager {
             @Override
             public void onPageSelected(int position) {
                 currView = adapter.getSonView(position);
-                if (monthPagerChangeListener != null && currView != null)
-                    monthPagerChangeListener.pagerChangeCallBack(position, currView.getSelYear(), currView.getSelMonth(), currView.getSelDay());
+                if (listener != null && currView != null)
+                    listener.clickCallBacak(currView.getSelYear(), currView.getSelMonth(), currView.getSelDay());
             }
 
             @Override
