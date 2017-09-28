@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/list_all_lly"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <!--<include layout="@layout/activity_calendar_merge" />-->
+    <View style="@style/line_crude_division_view" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:id="@+id/today_wait_collection_lly"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日待回款(元)"
+                android:textColor="@color/black999999"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/today_wait_collection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black333333"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/today_collection_lly"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日已回款(元)"
+                android:textColor="@color/black999999"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/today_collection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Redf05858"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.flyco.tablayout.SlidingTabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#ffffff"
+        app:tl_divider_color="#ffffff"
+        app:tl_divider_padding="13dp"
+        app:tl_divider_width="1dp"
+        app:tl_indicator_color="@color/Redf05858"
+        app:tl_indicator_height="3dp"
+        app:tl_indicator_width_equal_title="true"
+        app:tl_tab_padding="22dp"
+        app:tl_tab_space_equal="true"
+        app:tl_textSelectColor="@color/Redf05858"
+        app:tl_textUnselectColor="#000000"
+        app:tl_textsize="16sp"
+        app:tl_underline_color="#00000000"
+        app:tl_underline_height="3dp" />
+
+    <View style="@style/LineGray_h" />
+
+    <com.example.jiashuai.calendarview.xiaoziqianbao3_4.calendar.calendar.list.CalendarListViewPager
+        android:id="@+id/collection_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

@@ -14,6 +14,7 @@ import com.flyco.tablayout.SlidingTabLayout;
  */
 
 public class CalendarSlidingTabLayout extends SlidingTabLayout {
+    private int mHeight;
 
     public CalendarSlidingTabLayout(Context context) {
         this(context, null);
@@ -31,6 +32,7 @@ public class CalendarSlidingTabLayout extends SlidingTabLayout {
     private void initView() {
         DisplayMetrics mDisplayMetrics = getResources().getDisplayMetrics();
         int mDpi = (int) mDisplayMetrics.density;
+        mHeight = 48 * mDpi;
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 48 * mDpi));
         setBackgroundColor(Color.parseColor("#ffffff"));
         setTextsize(15);
@@ -50,5 +52,8 @@ public class CalendarSlidingTabLayout extends SlidingTabLayout {
 //        setTabWidthEqualSize(7);//tabwidth屏幕7分之一
 
         super.onDraw(canvas);
+    }
+    public int getmHeight() {
+        return mHeight;
     }
 }

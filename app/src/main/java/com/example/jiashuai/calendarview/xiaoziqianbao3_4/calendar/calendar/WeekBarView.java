@@ -1,4 +1,4 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao3_4.calendar.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.example.jiashuai.calendarview.R;
+
 
 /**
  * Created by Jimmy on 2016/10/6 0006.
@@ -26,6 +27,7 @@ public class WeekBarView extends View {
     private Paint mLinPaint;
     private DisplayMetrics mDisplayMetrics;
     private String[] mWeekString;
+    private int mWeekHeight;
 
     public WeekBarView(Context context) {
         this(context, null);
@@ -48,16 +50,17 @@ public class WeekBarView extends View {
         mWeekSize = array.getInteger(R.styleable.WeekBarView_week_text_size, 14);
         linColor = array.getInteger(R.styleable.WeekBarView_linColor, Color.parseColor("#efefef"));
         linHeight = array.getInteger(R.styleable.WeekBarView_linHeight, 1);
-        backgroundColor = array.getInteger(R.styleable.WeekBarView_backgroundColor,Color.parseColor("#fafafa"));
+        backgroundColor = array.getInteger(R.styleable.WeekBarView_backgroundColor, Color.parseColor("#fafafa"));
         array.recycle();
         mWeekString = context.getResources().getStringArray(R.array.calendar_week);
     }
 
     private void initPaint() {
         mDisplayMetrics = getResources().getDisplayMetrics();
+        mWeekHeight = (int) (mDisplayMetrics.scaledDensity * 40);
         mLinPaint = new Paint();
         mLinPaint.setColor(linColor);
-        mLinPaint.setStrokeWidth((float) linHeight* mDisplayMetrics.scaledDensity);
+        mLinPaint.setStrokeWidth((float) linHeight * mDisplayMetrics.scaledDensity);
 
 
         //实例化文字画笔
@@ -74,9 +77,8 @@ public class WeekBarView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightSize = (int) (mDisplayMetrics.scaledDensity * 40);
+            heightSize = mWeekHeight;
         }
-
         setMeasuredDimension(widthSize, heightSize);
     }
 
@@ -86,7 +88,7 @@ public class WeekBarView extends View {
         int height = getHeight();
         canvas.drawColor(backgroundColor);
         //绘制线条
-        canvas.drawLine(0, 1, width, 1, mLinPaint);
+        canvas.drawLine(0, 0, width, 0, mLinPaint);
         canvas.drawLine(0, height, width, height, mLinPaint);
 
         //绘制文字
@@ -105,4 +107,7 @@ public class WeekBarView extends View {
         }
     }
 
+    public int getmWeekHeight() {
+        return mWeekHeight;
+    }
 }

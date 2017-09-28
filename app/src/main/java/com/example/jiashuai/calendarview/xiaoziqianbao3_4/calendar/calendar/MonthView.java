@@ -1,4 +1,4 @@
-package com.example.jiashuai.calendarview.calendar;
+package com.example.jiashuai.calendarview.xiaoziqianbao3_4.calendar.calendar;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,10 +11,17 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+
+import com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.bean.CollectionDateBean;
+import com.example.jiashuai.calendarview.xiaoziqianbao.calendarview.calendarview.Utils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by JiaShuai on 2017/4/18.
+ * 注意，currMonth取得是自然月从1开始
+ * selMonth取得是JAVA标准，从0开始
  */
 
 public class MonthView extends View {
@@ -43,7 +50,8 @@ public class MonthView extends View {
     private int weekNumber, monthDays;//本月一号是星期几，本月有多少天
     private int selectMonthRow;//计算当前月份是5行还是6行
     private OnClickMonthViewDayListener onClickMonthViewDayListener;
-    private List<Integer> mHintList;
+    private List<Integer> mHintList = new ArrayList<>();
+    private int mSelRow;//选中行；
 
 
     private void initGestureDetector() {
@@ -66,15 +74,18 @@ public class MonthView extends View {
             return;
         int row = y / mRowSize;
         int column = x / mColumnSize;
-//        column = Math.min(column, 6);//防止越界
-        if (mDaysText[row][column] != 0) {
+        column = Math.min(column, 6);//防止越界
+        if (mDaysText != null && mDaysText[row][column] != 0) {
             mSelDay = mDaysText[row][column];
-            if (onClickMonthViewDayListener != null)
-                onClickMonthViewDayListener.clickCallBacak(getSelYear(), getSelMonth(), getSelDay());
+            if (onClickMonthViewDayListener != null) {
+                onClickMonthViewDayListener.clickCallBack(getSelYear(), getSelMonth(), getSelDay(), hintListContainCheckDay());
+            } else {
+                throw new NullPointerException("MonthView onClickMonthViewDayListener is null");
+            }
         } else {
+//            throw  new NullPointerException("MonthView mDaysText == null && mDaysText[row][column] == 0 ");
             return;
         }
-//        Log.i("CalendarView", "------------" + "Year:" + mSelYear + "Month:" + (mSelMonth + 1) + "Day:" + mSelDay);
         invalidate();
 
 
@@ -141,8 +152,6 @@ public class MonthView extends View {
         mCurrYear = year;
         mCurrMonth = month;
         mSelDay = mCurrDay = day;
-        invalidate();
-
     }
 
     @Override
@@ -157,7 +166,7 @@ public class MonthView extends View {
 //        }
 //        if (widthMode == MeasureSpec.AT_MOST) {
 //        }
-        int heightSize = mDisplayMetrics.heightPixels / 5 * 2;//这里必须写固定大小，如果测量View的高度，View高度改变，文字高度也会跟着改变，
+        int heightSize = mDisplayMetrics.heightPixels / 3;//这里必须写固定大小，如果测量View的高度，View高度改变，文字高度也会跟着改变，
         initSize(widthSize, heightSize);
         setMeasuredDimension(widthSize, heightSize);//设置view大小
 
@@ -175,8 +184,8 @@ public class MonthView extends View {
     private void initSize(int widthSize, int heightSize) {
         mColumnSize = widthSize / NUM_COLUMNS;//View宽度/7=文字宽度
         mRowSize = heightSize / NUM_ROWS;//View高度/6 = 文字高度
-        mSelectCircleSize = mColumnSize / 4;//圆圈的大小;
-        mHintCircleRadius = (int) (mSelectCircleSize / 5);
+        mSelectCircleSize = (int) (mColumnSize / 4.5);//圆圈的大小;
+        mHintCircleRadius = (mSelectCircleSize / 4);
         while (mSelectCircleSize > mRowSize / 2) {//如果圆圈大小超出view高度/1.3
             mSelectCircleSize = (int) (mSelectCircleSize / 1.3);
         }
@@ -198,37 +207,28 @@ public class MonthView extends View {
 
             int startX = (int) (mColumnSize * column + (mColumnSize / 2 - mPaint.measureText(dayString) / 2));//文字x起始坐标  （单个长度*横坐标+（单个长度-文字长度）/2）=x起始坐标
             int startY = (int) (mRowSize * row + (mRowSize / 2 - (mPaint.ascent() + mPaint.descent()) / 2));//文字y起始坐标， 根据绘制文字基线计算，
-            if (dayString.equals(String.valueOf(mSelDay))) {//如果是选中的天
-                float recX = mColumnSize * column + mColumnSize / 2;//圆心x
-                float recY = mRowSize * row + mRowSize / 2;//圆心y
-                if (mSelYear == mCurrYear && mSelMonth == mCurrMonth && day + 1 == mCurrDay) {//如果选中的是当天
-                    mPaint.setColor(mSelectTodayCircleBGColor);
-                } else {
-                    mPaint.setColor(mSelectCircleBGColor);
-                }
-                canvas.drawCircle(recX, recY, mSelectCircleSize, mPaint);
-            }
-            drowHint(canvas, day, row, column);
             mPaint.setColor(mDayTextColor);
             if (column == 0 || column == 6) {
                 mPaint.setColor(mTheWeekendTextColor);
             }
             if (dayString.equals(String.valueOf(mCurrDay)) && mCurrDay != mSelDay && mCurrMonth - 1 == mSelMonth && mCurrYear == mSelYear) {
-                mPaint.setColor(mTodayTextColor);
+                mPaint.setColor(mTodayTextColor);//今天
             }
-            if (dayString.equals(String.valueOf(mCurrDay)) && mCurrDay == mSelDay && mCurrMonth - 1 == mSelMonth && mCurrYear == mSelYear) {
-                mPaint.setColor(mSelectTodayTextColor);
-            }
+//            if (dayString.equals(String.valueOf(mCurrDay)) && mCurrDay == mSelDay && mCurrMonth - 1 == mSelMonth && mCurrYear == mSelYear) {
+//                mPaint.setColor(mSelectTodayTextColor);//选择今天
+//            }
             if (dayString.equals(String.valueOf(mSelDay))) {
+                drawSelect(column, row, canvas, day);
                 mPaint.setColor(mSelectTextColor);
             }
             canvas.drawText(dayString, startX, startY, mPaint);
+            drawHint(canvas, day, row, column);
 
         }
 
     }
 
-    private void drowHint(Canvas canvas, int day, int row, int column) {
+    private void drawHint(Canvas canvas, int day, int row, int column) {
         if (mHintList != null && mHintList.size() > 0) {
             if (!mHintList.contains(day + 1)) return;
             mPaint.setColor(mHintCircleColor);
@@ -236,8 +236,18 @@ public class MonthView extends View {
             float hinX = mColumnSize * column + mColumnSize / 2;
             canvas.drawCircle(hinX, hinY, mHintCircleRadius, mPaint);
         }
+    }
 
-
+    private void drawSelect(int column, int row, Canvas canvas, int day) {
+        float recX = mColumnSize * column + mColumnSize / 2;//圆心x
+        float recY = mRowSize * row + mRowSize / 2;//圆心y
+        if (mSelYear == mCurrYear && mSelMonth == mCurrMonth - 1 && day + 1 == mCurrDay) {//如果选中的是当天
+            mPaint.setColor(mSelectTodayCircleBGColor);
+        } else {
+            mPaint.setColor(mSelectCircleBGColor);
+        }
+        canvas.drawCircle(recX, recY, mSelectCircleSize, mPaint);
+        mSelRow = row;
     }
 
     @Override
@@ -248,6 +258,25 @@ public class MonthView extends View {
     //获取绘制VIew高度
     public int getCalendarViewHight() {
         return thisHight;
+    }
+
+    /**
+     * 单行高度
+     *
+     * @return
+     */
+    public int getmRowSize() {
+        return mRowSize;
+    }
+
+    //本月有几个星期
+    public int getMonthRow() {
+        return selectMonthRow;
+    }
+
+    //选中第几周从0开始
+    public int getmSelRow() {
+        return mSelRow;
     }
 
     //获取选中的年
@@ -269,13 +298,38 @@ public class MonthView extends View {
         this.onClickMonthViewDayListener = listener;
     }
 
-    public void setmHintList(List<Integer> mHintList) {
-        this.mHintList = mHintList;
-        if (mHintList != null && mHintList.size() > 0)
+    public void setmHintList(List<CollectionDateBean.Data.YearData.MonthData.DayData> yearDataList) {
+        if (!Utils.listIsNull(yearDataList))
+            for (CollectionDateBean.Data.YearData.MonthData.DayData dayData : yearDataList) {
+                String[] ss = dayData.getDueDate().split("-");
+                mHintList.add(Integer.parseInt(ss[ss.length - 1]));
+            }
+        if (mCurrYear == getSelYear() && mCurrMonth == getSelMonth() && mCurrDay != 0)//如果是当年当月，则选中的天为今天
+        {
+            mSelDay = mCurrDay;
+        } else if (!Utils.listIsNull(mHintList)) {//先判断有没有回款，如果有则选中第一天
             mSelDay = mHintList.get(0);
+        } else {//如果没有默认选择1号
+            mSelDay = 1;
+        }
     }
 
-    public interface OnClickMonthViewDayListener {
-        void clickCallBacak(int selYear, int selMonth, int selDay);
+    public void setSelectDay(int day) {
+        mSelDay = day;
+        mSelRow = (day + weekNumber - 1) / 7;
+        invalidate();
     }
+
+    public boolean hintListContainCheckDay() {
+        return mHintList.contains(mSelDay);
+    }
+
+    public void clickCurrentListener() {
+        if (onClickMonthViewDayListener != null) {
+            onClickMonthViewDayListener.clickCallBack(getSelYear(), getSelMonth(), getSelDay(), hintListContainCheckDay());
+        } else {
+            throw new NullPointerException("MonthView onClickMonthViewDayListener is null");
+        }
+    }
+
 }
